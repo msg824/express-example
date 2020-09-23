@@ -1,14 +1,16 @@
 const { Sequelize } = require('sequelize');
 const { applyExtraSetup } = require('./extra-setup');
+const dotenv = require('dotenv');
+dotenv.config();
+
+const { RDS_DB, RDS_HOST, RDS_USER, RDS_PWD } = process.env;
 
 // In a real app, you should keep the database connection URL as an environment variable.
 // But for this example, we will just use a local SQLite database.
 // const sequelize = new Sequelize(process.env.DB_CONNECTION_URL);
-const sequelize = new Sequelize({
-	dialect: 'sqlite',
-	storage: 'sqlite-example-database/example-db.sqlite',
-	logQueryParameters: true,
-	benchmark: true
+const sequelize = new Sequelize(RDS_DB, RDS_USER, RDS_PWD, {
+	host: RDS_HOST,
+	dialect: 'mysql',
 });
 
 const modelDefiners = [
@@ -26,6 +28,7 @@ for (const modelDefiner of modelDefiners) {
 
 // We execute any extra setup after the models are defined, such as adding associations.
 applyExtraSetup(sequelize);
+sequelize.sync();
 
 // We export the sequelize connection instance to be used around our app.
 module.exports = sequelize;
